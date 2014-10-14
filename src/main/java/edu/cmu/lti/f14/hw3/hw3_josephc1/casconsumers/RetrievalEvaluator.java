@@ -16,9 +16,9 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.ProcessTrace;
 
-import edu.cmu.lti.f14.hw3.hw3_josephc1.annotators.DocumentVectorAnnotator.MutableInteger;
 import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Document;
 import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Token;
+import edu.cmu.lti.f14.hw3.hw3_josephc1.utils.MemoryStore;
 import edu.cmu.lti.f14.hw3.hw3_josephc1.utils.Utils;
 
 public class RetrievalEvaluator extends CasConsumer_ImplBase {
@@ -50,6 +50,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
       throw new ResourceProcessException(e);
     }
 
+
     FSIterator it = jcas.getAnnotationIndex(Document.type).iterator();
 
     if (it.hasNext()) {
@@ -58,6 +59,13 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
       // Make sure that your previous annotators have populated this in CAS
       FSList fsTokenList = doc.getTokenList();
       ArrayList<Token> tokenList = Utils.fromFSListToCollection(fsTokenList, Token.class);
+      Map<String, Integer> counter = Utils.fromTokenListToMap(tokenList);
+//      System.out.println(counter);
+//      System.out.println(unitVector(counter));
+//      System.out.println("---");
+//      System.out.println(doc.getQueryID());
+//      System.out.println(doc.getRelevanceValue());
+//      System.out.println(doc.get);
 
       qIdList.add(doc.getQueryID());
       relList.add(doc.getRelevanceValue());
@@ -115,6 +123,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
         out += A.get(word) * B.get(word);
       }
     }
+    return out;
   }
   
   /**
