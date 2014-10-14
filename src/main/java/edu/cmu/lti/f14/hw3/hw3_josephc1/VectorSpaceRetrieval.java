@@ -39,7 +39,7 @@ public class VectorSpaceRetrieval {
 	
 	public static void main(String [] args) 
 			throws Exception {
-			
+			  
 		String sLine;
 		long startTime=System.currentTimeMillis();
 		
@@ -51,14 +51,14 @@ public class VectorSpaceRetrieval {
 		XMLInputSource input = new XMLInputSource(descUrl);
 		AnalysisEngineDescription desc = UIMAFramework.getXMLParser().parseAnalysisEngineDescription(input);
 		AnalysisEngine anAnalysisEngine = UIMAFramework.produceAnalysisEngine(desc);
-		CAS aCas = anAnalysisEngine.newCAS();
 
 	  URL docUrl = VectorSpaceRetrieval.class.getResource("/data/documents.txt");
     if (docUrl == null) {
        throw new IllegalArgumentException("Error opening data/documents.txt");
     }
+    CAS aCas = anAnalysisEngine.newCAS();
 		BufferedReader br = new BufferedReader(new InputStreamReader(docUrl.openStream()));
-		while ((sLine = br.readLine()) != null)   {
+		while ((sLine = br.readLine()) != null)   {		  
 			aCas.setDocumentText(sLine);
 			anAnalysisEngine.process(aCas);
 			aCas.reset();

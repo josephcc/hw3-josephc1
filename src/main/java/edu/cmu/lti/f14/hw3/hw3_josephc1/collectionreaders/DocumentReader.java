@@ -52,6 +52,7 @@ extends JCasAnnotator_ImplBase  {
 		String    sResRel = (rec[1]).replace("rel=", "");
 		
 
+		
 		StringBuffer sResTxt = new StringBuffer();
 		for (int i=2; i<rec.length; i++) {
 			sResTxt.append(rec[i]).append(" ");					
