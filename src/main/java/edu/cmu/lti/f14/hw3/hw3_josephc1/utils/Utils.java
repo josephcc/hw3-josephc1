@@ -18,6 +18,7 @@ import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.uimafit.util.JCasUtil;
 
+import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Document;
 import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Token;
 
 public class Utils {
@@ -43,6 +44,13 @@ public class Utils {
     for(Token token: tokenList) {
       counter.put(token.getText(), token.getFrequency());     
     }
+    return counter;
+  }
+  
+  public static Map<String, Number> fromDocumentToVector(Document doc) {
+    FSList fsTokenList = doc.getTokenList();
+    ArrayList<Token> tokenList = Utils.fromFSListToCollection(fsTokenList, Token.class);
+    Map<String, Number> counter = Utils.fromTokenListToMap(tokenList);
     return counter;
   }
 
