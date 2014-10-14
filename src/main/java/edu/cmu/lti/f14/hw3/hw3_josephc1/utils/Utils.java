@@ -22,6 +22,7 @@ import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Token;
 
 public class Utils {
   public static final String NDOC_KEY = "::NDOC::";
+  public static final String TOTAL_LENGTH_KEY = "::TOTAL_LENGTH::";
   public static String fromQueryIdToKey(Integer queryId) {
     return "IDF:QID" + queryId;
   }
