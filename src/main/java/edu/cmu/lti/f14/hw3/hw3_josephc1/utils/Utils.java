@@ -21,6 +21,10 @@ import org.uimafit.util.JCasUtil;
 import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Token;
 
 public class Utils {
+  public static final String NDOC_KEY = "::NDOC::";
+  public static String fromQueryIdToKey(Integer queryId) {
+    return "IDF:QID" + queryId;
+  }
   public static ArrayList<Token> fromMapToTokenList(JCas jcas, Map<String, MutableInteger> counter) {
     ArrayList<Token> tokenList = new ArrayList<Token>(counter.size());
     for (Entry<String, MutableInteger> entry : counter.entrySet()) {
@@ -33,11 +37,10 @@ public class Utils {
     }
     return tokenList;
   }
-  public static Map<String, Integer> fromTokenListToMap(ArrayList<Token> tokenList) {
-    Map<String, Integer> counter = new HashMap<String, Integer>();
+  public static Map<String, Number> fromTokenListToMap(ArrayList<Token> tokenList) {
+    Map<String, Number> counter = new HashMap<String, Number>();
     for(Token token: tokenList) {
-      counter.put(token.getText(), token.getFrequency());
-      
+      counter.put(token.getText(), token.getFrequency());     
     }
     return counter;
   }

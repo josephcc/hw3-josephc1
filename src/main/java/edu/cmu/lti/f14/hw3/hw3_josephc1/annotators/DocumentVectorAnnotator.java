@@ -55,7 +55,13 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
     pipeline.annotate(document);
 
     HashMap<String, MutableInteger> counter = new HashMap<String, MutableInteger>();
-    HashMap<String, Object> IDF = MemoryStore.getSingletonInstance("IDF:QID" + doc.getQueryID()).data;
+    HashMap<String, Object> IDF = MemoryStore.getSingletonInstance(Utils.fromQueryIdToKey(doc.getQueryID())).data;
+    Integer ndoc = (Integer) IDF.get(Utils.NDOC_KEY);
+    if (ndoc == null) {
+      IDF.put(Utils.NDOC_KEY, Integer.valueOf(1));
+    } else {
+      IDF.put(Utils.NDOC_KEY, Integer.valueOf(1 + ndoc));
+    }
     for (CoreLabel token : document.get(TokensAnnotation.class)) {
        String word = token.get(TextAnnotation.class).toLowerCase();
        MutableInteger initValue = new MutableInteger(1);
