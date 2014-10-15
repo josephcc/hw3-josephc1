@@ -64,9 +64,9 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
     }
     Integer total_length = (Integer) IDF.get(Utils.TOTAL_LENGTH_KEY);
     if (total_length == null) {
-      IDF.put(Utils.NDOC_KEY, document.get(TokensAnnotation.class).size());
+      IDF.put(Utils.TOTAL_LENGTH_KEY, document.get(TokensAnnotation.class).size());
     } else {
-      IDF.put(Utils.NDOC_KEY, document.get(TokensAnnotation.class).size() + total_length);
+      IDF.put(Utils.TOTAL_LENGTH_KEY, document.get(TokensAnnotation.class).size() + total_length);
     }
     for (CoreLabel token : document.get(TokensAnnotation.class)) {
        String word = token.get(TextAnnotation.class).toLowerCase();
