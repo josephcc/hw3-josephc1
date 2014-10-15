@@ -83,22 +83,15 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
     // TODO :: compute the metric:: mean reciprocal rank
 
     for (StaticDocument query : queries) {
-
-      System.out.println(query.queryId);
-
       Integer queryId = query.queryId;
-      
       Map<String, Double> queryVector = Utils.fromIntegerMapToDoubleMap(query.vector);
-
       for (StaticDocument candidate : corpora.get(queryId)) {
         Map<String, Double> docVector =  Utils.fromIntegerMapToDoubleMap(candidate.vector);
         double cosineSimilarity = Similarity.computeCosineSimilarity(queryVector, docVector);
         double tfidfCosineSimilarity = Similarity.computeCosineSimilarity(Similarity.tfidf(queryVector, queryId), Similarity.tfidf(docVector, queryId));
         double okapiScore = Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 1.2, 0.75); // k=1.2~2.0 b=0.75
-        candidate.score = okapiScore;
+        candidate.score = tfidfCosineSimilarity;
       }
-      Collections.sort(corpora.get(queryId), Collections.reverseOrder());
-      System.out.println(corpora.get(queryId));
     }
 
     double metric_mrr = compute_mrr();
@@ -112,7 +105,20 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
   private double compute_mrr() {
     double metric_mrr = 0.0;
 
-    // TODO :: compute Mean Reciprocal Rank (MRR) of the text collection
+    for (StaticDocument query : queries) {
+      Integer queryId = query.queryId;
+      Collections.sort(corpora.get(queryId), Collections.reverseOrder());
+//      System.out.println(corpora.get(queryId));
+      int r = 1;
+      for (StaticDocument candidate : corpora.get(queryId)) {
+        if (candidate.relevance == 1) {
+          break;
+        }
+        r += 1;
+      }
+      metric_mrr += 1.0 / r;
+    }
+    metric_mrr /= queries.size();
 
     return metric_mrr;
   }
