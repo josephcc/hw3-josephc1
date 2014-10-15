@@ -19,6 +19,7 @@ import org.apache.uima.jcas.cas.NonEmptyStringList;
 import org.apache.uima.jcas.cas.StringList;
 import org.apache.uima.jcas.cas.TOP;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.tartarus.snowball.ext.PorterStemmer;
 import org.uimafit.util.JCasUtil;
 
 import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Document;
@@ -145,6 +146,15 @@ public class Utils {
     char[] _word = word.toCharArray();
     int _length = stemmer.stem(_word, word.length());
     return new String(_word, 0, _length);
+  }
+  
+  public static String porterStem(String word) {
+    
+    PorterStemmer obj = new PorterStemmer();
+    obj.setCurrent(word);
+    obj.stem();
+    String out = obj.getCurrent();
+    return out;
   }
   
   public static List<String> stanfordTokenizer(String doc) {

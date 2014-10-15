@@ -64,7 +64,6 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
        word = Utils.minimalStem(word.toLowerCase());
        
        if (Pattern.matches("\\p{Punct}+", word) || word.length() < 4 || StopAnalyzer.ENGLISH_STOP_WORDS_SET.contains(word)) {
-         System.out.println(word);
          continue;
        }
        document_length += 1;
