@@ -5,23 +5,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FSIterator;
-import org.apache.uima.cas.impl.CASSerializer;
-import org.apache.uima.cas.impl.Serialization;
 import org.apache.uima.collection.CasConsumer_ImplBase;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.util.ProcessTrace;
 
 import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Document;
-import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Token;
-import edu.cmu.lti.f14.hw3.hw3_josephc1.utils.MemoryStore;
 import edu.cmu.lti.f14.hw3.hw3_josephc1.utils.Similarity;
 import edu.cmu.lti.f14.hw3.hw3_josephc1.utils.StaticDocument;
 import edu.cmu.lti.f14.hw3.hw3_josephc1.utils.Utils;
@@ -104,7 +98,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
         double cosineSimilarity = Similarity.computeCosineSimilarity(queryVector, docVector);
         double tfidfCosineSimilarity = Similarity.computeCosineSimilarity(Similarity.tfidf(queryVector, queryId), Similarity.tfidf(docVector, queryId));
         double okapiScore = Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 1.2, 0.75); // k=1.2~2.0 b=0.75
-        candidate.score = tfidfCosineSimilarity;
+        candidate.score = okapiScore;
       }
       Collections.sort(corpora.get(queryId), Collections.reverseOrder());
     }
@@ -116,7 +110,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
    */
   private double compute_mrr() {
     double metric_mrr = 0.0;
-
+    System.out.printf("\n[");
     for (StaticDocument query : queries) {
       Integer queryId = query.queryId;
       int r = 1;
@@ -127,7 +121,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
         r += 1;
       }
       metric_mrr += 1.0 / r;
+      System.out.printf((1.0 / r) + ", ");
     }
+    System.out.printf("]\n");
     metric_mrr /= queries.size();
 
     return metric_mrr;

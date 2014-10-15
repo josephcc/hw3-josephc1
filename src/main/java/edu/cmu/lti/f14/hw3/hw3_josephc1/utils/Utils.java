@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.apache.uima.jcas.JCas;
@@ -20,13 +22,26 @@ import org.uimafit.util.JCasUtil;
 
 import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Document;
 import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Token;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 public class Utils {
+  private Utils() {}
   public static final String NDOC_KEY = "::NDOC::";
   public static final String TOTAL_LENGTH_KEY = "::TOTAL_LENGTH::";
   public static String fromQueryIdToKey(Integer queryId) {
     return "IDF:QID" + queryId;
   }
+  private static Properties props;
+  private static StanfordCoreNLP pipeline; 
+  static {
+    props = new Properties();
+    props.put("annotators", "tokenize");
+    pipeline = new StanfordCoreNLP(props);
+  }
+  
   public static ArrayList<Token> fromMapToTokenList(JCas jcas, Map<String, MutableInteger> counter) {
     ArrayList<Token> tokenList = new ArrayList<Token>(counter.size());
     for (Entry<String, MutableInteger> entry : counter.entrySet()) {
@@ -112,6 +127,31 @@ public class Utils {
     }
 
     return list;
+  }
+  
+  public static List<String> spaceTokenizer(String doc) {
+    List<String> res = new ArrayList<String>();
+    
+    for (String s: doc.split("\\s+")) {
+      res.add(s);
+    }
+    return res;
+  }
+  
+  public static List<String> stanfordTokenizer(String doc) {
+    List<String> res = new ArrayList<String>();
+
+    //joseph TODO: init this in cls initzr
+
+
+    edu.stanford.nlp.pipeline.Annotation document = new edu.stanford.nlp.pipeline.Annotation(doc);
+    Utils.pipeline.annotate(document);
+
+    for (CoreLabel token : document.get(TokensAnnotation.class)) {
+       String word = token.get(TextAnnotation.class).toLowerCase();
+       res.add(word);
+    }
+    return res;
   }
   
   public static class MutableInteger {

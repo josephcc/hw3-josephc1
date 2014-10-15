@@ -2,8 +2,7 @@ package edu.cmu.lti.f14.hw3.hw3_josephc1.annotators;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
@@ -45,14 +44,7 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 	 */
 	private void createTermFreqVector(JCas jcas, Document doc) {
 	  
-	  //joseph TODO: init this in cls initzr
-    Properties props = new Properties();
-    props.put("annotators", "tokenize");
-    StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-
-		String docText = doc.getText();
-		edu.stanford.nlp.pipeline.Annotation document = new edu.stanford.nlp.pipeline.Annotation(docText);
-    pipeline.annotate(document);
+	  List<String> tokens = Utils.stanfordTokenizer(doc.getText());
 
     HashMap<String, MutableInteger> counter = new HashMap<String, MutableInteger>();
     HashMap<String, Object> IDF = MemoryStore.getSingletonInstance(Utils.fromQueryIdToKey(doc.getQueryID())).data;
@@ -63,8 +55,7 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
       IDF.put(Utils.NDOC_KEY, Integer.valueOf(1 + ndoc));
     }
     int document_length = 0;
-    for (CoreLabel token : document.get(TokensAnnotation.class)) {
-       String word = token.get(TextAnnotation.class).toLowerCase();
+    for (String word : tokens) {
        if (word.length() < 4) {
          continue;
        }
