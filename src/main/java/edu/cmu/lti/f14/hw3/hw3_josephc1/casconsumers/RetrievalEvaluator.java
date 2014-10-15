@@ -96,20 +96,21 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
        */
       // System.out.println(query);
       System.out.println(query.queryId);
-      // Integer queryId = query.getQueryID();
-      // Map<String, Number> queryVector = Utils.fromDocumentToVector(query);
-      //
-      // for(Document candidate: corpora.get(queryId)) {
-      // Map<String, Number> docVector = Utils.fromDocumentToVector(candidate);
-      // System.out.println(candidate.getRelevanceValue());
-      // System.out.println(Similarity.computeCosineSimilarity(queryVector, docVector));
-      // System.out.println(Similarity.computeCosineSimilarity(Similarity.tfidf(queryVector,
-      // queryId), Similarity.tfidf(docVector, queryId)));
-      // System.out.println(Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 1.2,
-      // 0.75)); // k=1.2~2.0 b=0.75
-      // System.out.println("---------------");
-      //
-      // }
+
+      Integer queryId = query.queryId;
+      Map<String, Number> queryVector = query.vector;
+
+      for (StaticDocument candidate : corpora.get(queryId)) {
+        Map<String, Number> docVector = candidate.vector;
+        System.out.println("---------------");
+        System.out.println(candidate.relevance);
+        System.out.println(Similarity.computeCosineSimilarity(queryVector, docVector));
+        System.out.println(Similarity.computeCosineSimilarity(Similarity.tfidf(queryVector, queryId), Similarity.tfidf(docVector, queryId)));
+        System.out.println(Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 1.2, 0.75)); // k=1.2~2.0 b=0.75
+        System.out.println(Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 2.0, 0.75)); // k=1.2~2.0 b=0.75
+        System.out.println("---------------");
+
+      }
 
     }
 
