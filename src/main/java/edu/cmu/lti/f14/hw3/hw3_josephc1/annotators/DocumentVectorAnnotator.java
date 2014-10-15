@@ -62,14 +62,13 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
     } else {
       IDF.put(Utils.NDOC_KEY, Integer.valueOf(1 + ndoc));
     }
-    Integer total_length = (Integer) IDF.get(Utils.TOTAL_LENGTH_KEY);
-    if (total_length == null) {
-      IDF.put(Utils.TOTAL_LENGTH_KEY, document.get(TokensAnnotation.class).size());
-    } else {
-      IDF.put(Utils.TOTAL_LENGTH_KEY, document.get(TokensAnnotation.class).size() + total_length);
-    }
+    int document_length = 0;
     for (CoreLabel token : document.get(TokensAnnotation.class)) {
        String word = token.get(TextAnnotation.class).toLowerCase();
+       if (word.length() < 4) {
+         continue;
+       }
+       document_length += 1;
        MutableInteger initValue = new MutableInteger(1);
        MutableInteger oldValue = counter.put(word, initValue);
       
@@ -83,6 +82,12 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
            IDF.put(word, Integer.valueOf(1 + current));
          }
        }
+    }
+    Integer total_length = (Integer) IDF.get(Utils.TOTAL_LENGTH_KEY);
+    if (total_length == null) {
+      IDF.put(Utils.TOTAL_LENGTH_KEY, document_length);
+    } else {
+      IDF.put(Utils.TOTAL_LENGTH_KEY, document_length + total_length);
     }
     ArrayList<Token> tokenList = Utils.fromMapToTokenList(jcas, counter);
     FSList tokenFSList = Utils.fromCollectionToFSList(jcas, tokenList);
