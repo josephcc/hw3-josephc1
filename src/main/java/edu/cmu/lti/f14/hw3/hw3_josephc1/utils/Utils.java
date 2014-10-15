@@ -39,6 +39,13 @@ public class Utils {
     }
     return tokenList;
   }
+  public static Map<String, Double> fromIntegerMapToDoubleMap(Map<String, Number> vector) {
+    Map<String, Double> out = new HashMap<String, Double>();
+    for(Entry<String, Number> entry : vector.entrySet()) {
+      out.put(entry.getKey(), entry.getValue().doubleValue());
+    }
+    return out;
+  }
   public static Map<String, Number> fromTokenListToMap(ArrayList<Token> tokenList) {
     Map<String, Number> counter = new HashMap<String, Number>();
     for(Token token: tokenList) {

@@ -6,13 +6,24 @@ import java.util.Map.Entry;
 
 public class Similarity {
 
-  public static Map<String, Double> unitVector(Map<String, Number> A){
-    double total = 0;
-    for (Number count: A.values()) {
+  public static Map<String, Double> unitVector(Map<String, Double> queryVector){
+    double norm = norm(queryVector);
+    HashMap<String, Double> out = new HashMap<String, Double>();
+    for (Entry<String, Double> entry : queryVector.entrySet()) {
+      String text = entry.getKey();
+      double count = entry.getValue().doubleValue();
+      out.put(text, count / norm);
+    }
+    return out;
+  }
+  
+  public static Map<String, Double> pdfVector(Map<String, Double> A){
+    double total = 0.0;
+    for (Double count: A.values()) {
       total += count.doubleValue();
     }
     HashMap<String, Double> out = new HashMap<String, Double>();
-    for (Entry<String, Number> entry : A.entrySet()) {
+    for (Entry<String, Double> entry : A.entrySet()) {
       String text = entry.getKey();
       double count = entry.getValue().doubleValue();
       out.put(text, count / total);
@@ -22,18 +33,18 @@ public class Similarity {
   
   public static Double idf(String term, Integer queryId) {
     HashMap<String, Object> IDF = MemoryStore.getSingletonInstance(Utils.fromQueryIdToKey(queryId)).data;
-    Double N = ((Integer) IDF.get(Utils.NDOC_KEY)).doubleValue();
-    Double n = ((Number)IDF.get(term)).doubleValue();
+    Double N = ((Number) IDF.get(Utils.NDOC_KEY)).doubleValue();
+    Double n = ((Number) IDF.get(term)).doubleValue();
     //return Math.log( N - n + 0.5 / (n + 0.5) ); // IDF from Okapi BM25, can be negative and problematic
     return Math.log(N/n);
   }
 
-  public static Double tf(Map<String, Number> A, String term) {
-    Integer n = (Integer) A.get(term);
+  public static Double tf(Map<String, Double> A, String term) {
+    Double n =  A.get(term);
     
-    Map.Entry<String, Number> maxEntry = null;
-    for (Map.Entry<String, Number> entry : A.entrySet()) {
-        if (maxEntry == null || ((Integer) entry.getValue()).compareTo((Integer) maxEntry.getValue()) > 0) {
+    Map.Entry<String, Double> maxEntry = null;
+    for (Map.Entry<String, Double> entry : A.entrySet()) {
+        if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {  
             maxEntry = entry;
         }
     } 
@@ -43,10 +54,10 @@ public class Similarity {
     return 0.5 + ((0.5 * n) / N);
   }
   
-  public static Map<String, Number> tfidf(Map<String, Number> A, Integer queryId) {
-    Map<String, Number> out = new HashMap<String, Number>();
+  public static Map<String, Double> tfidf(Map<String, Double> A, Integer queryId) {
+    Map<String, Double> out = new HashMap<String, Double>();
     
-    for (Map.Entry<String, Number> entry : A.entrySet()) {
+    for (Map.Entry<String, Double> entry : A.entrySet()) {
       
       Double _tf = tf(A, entry.getKey());
       Double _idf = idf(entry.getKey(), queryId);
@@ -58,10 +69,10 @@ public class Similarity {
   }
 
   
-  public static double norm(Map<String, Double> A){
+  public static double norm(Map<String, Double> queryVector){
     double out = 0.0;      
-    for (double prob: A.values()) {
-      out += prob*prob;
+    for (Number prob: queryVector.values()) {
+      out += prob.doubleValue() * prob.doubleValue();
     }
     return Math.sqrt(out);
   }
@@ -80,14 +91,15 @@ public class Similarity {
    * 
    * @return cosine_similarity
    */
-  public static double computeCosineSimilarity(Map<String, Number> queryVector, Map<String, Number> docVector) {
+  public static double computeCosineSimilarity(Map<String, Double> queryVector, Map<String, Double> docVector) {
     Map<String, Double> A = unitVector(queryVector);
     Map<String, Double> B = unitVector(docVector);
-    return dot(A, B) / (norm(A) * norm(B));
+    
+    return dot(A, B);// / (norm(A) * norm(B)); unit vectors has norm=1
   }
 
   
-  public static double computeOkapiBM25Score(Map<String, Number> queryVector, Map<String, Number> docVector, Integer queryId, double k, double b) {
+  public static double computeOkapiBM25Score(Map<String, Double> queryVector, Map<String, Double> docVector, Integer queryId, double k, double b) {
     
     Map<String, Double> A = unitVector(queryVector);
     Map<String, Double> B = unitVector(docVector);
@@ -103,7 +115,7 @@ public class Similarity {
       if(! B.containsKey(term)) {
         continue;
       }
-      double _tf = B.get(term);
+      double _tf = tf(B, entry.getKey());
       double _idf = idf(term, queryId);
       
       out += _idf * (_tf * (k + 1.0)) / (_tf + (k * (1 - b + (b*d/D))));

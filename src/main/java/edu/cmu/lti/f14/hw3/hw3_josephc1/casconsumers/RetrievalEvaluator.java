@@ -2,6 +2,7 @@ package edu.cmu.lti.f14.hw3.hw3_josephc1.casconsumers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -82,36 +83,22 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
     // TODO :: compute the metric:: mean reciprocal rank
 
     for (StaticDocument query : queries) {
-      /*
-       * - - // Make sure that your previous annotators have populated this in CAS - FSList
-       * fsTokenList = doc.getTokenList(); - ArrayList<Token> tokenList =
-       * Utils.fromFSListToCollection(fsTokenList, Token.class); - Map<String, Number> counter =
-       * Utils.fromTokenListToMap(tokenList); - System.out.println(counter); -
-       * System.out.println(Similarity.unitVector(counter)); -
-       * System.out.println(MemoryStore.getSingletonInstance
-       * (Utils.fromQueryIdToKey(doc.getQueryID())).data); -
-       * System.out.println(Similarity.tfidf(counter, doc.getQueryID())); -
-       * System.out.println(Similarity.unitVector(Similarity.tfidf(counter, doc.getQueryID()))); -
-       * System.out.println("-------------");
-       */
-      // System.out.println(query);
+
       System.out.println(query.queryId);
 
       Integer queryId = query.queryId;
-      Map<String, Number> queryVector = query.vector;
+      
+      Map<String, Double> queryVector = Utils.fromIntegerMapToDoubleMap(query.vector);
 
       for (StaticDocument candidate : corpora.get(queryId)) {
-        Map<String, Number> docVector = candidate.vector;
-        System.out.println("---------------");
-        System.out.println(candidate.relevance);
-        System.out.println(Similarity.computeCosineSimilarity(queryVector, docVector));
-        System.out.println(Similarity.computeCosineSimilarity(Similarity.tfidf(queryVector, queryId), Similarity.tfidf(docVector, queryId)));
-        System.out.println(Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 1.2, 0.75)); // k=1.2~2.0 b=0.75
-        System.out.println(Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 2.0, 0.75)); // k=1.2~2.0 b=0.75
-        System.out.println("---------------");
-
+        Map<String, Double> docVector =  Utils.fromIntegerMapToDoubleMap(candidate.vector);
+        double cosineSimilarity = Similarity.computeCosineSimilarity(queryVector, docVector);
+        double tfidfCosineSimilarity = Similarity.computeCosineSimilarity(Similarity.tfidf(queryVector, queryId), Similarity.tfidf(docVector, queryId));
+        double okapiScore = Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 1.2, 0.75); // k=1.2~2.0 b=0.75
+        candidate.score = okapiScore;
       }
-
+      Collections.sort(corpora.get(queryId), Collections.reverseOrder());
+      System.out.println(corpora.get(queryId));
     }
 
     double metric_mrr = compute_mrr();
