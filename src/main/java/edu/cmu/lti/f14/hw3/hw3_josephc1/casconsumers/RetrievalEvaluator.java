@@ -100,7 +100,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
         double cosineSimilarity = Similarity.computeCosineSimilarity(queryVector, docVector);
         double tfidfCosineSimilarity = Similarity.computeCosineSimilarity(Similarity.tfidf(queryVector, queryId), Similarity.tfidf(docVector, queryId));
         double okapiScore = Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 1.2, 0.75); // k=1.2~2.0 b=0.75
-        candidate.score = cosineSimilarity;
+        candidate.score = tfidfCosineSimilarity;
       }
       Collections.sort(corpora.get(queryId), Collections.reverseOrder());
     }
