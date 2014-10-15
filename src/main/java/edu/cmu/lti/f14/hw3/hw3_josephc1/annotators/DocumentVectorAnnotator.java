@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
+import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.en.EnglishMinimalStemmer;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSList;
 import org.apache.uima.jcas.tcas.Annotation;
+import org.tartarus.snowball.ext.PorterStemmer;
 
 import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Document;
 import edu.cmu.lti.f14.hw3.hw3_josephc1.typesystems.Token;
@@ -56,7 +60,11 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
     }
     int document_length = 0;
     for (String word : tokens) {
-       if (word.length() < 4) {
+      
+       word = Utils.minimalStem(word.toLowerCase());
+       
+       if (Pattern.matches("\\p{Punct}+", word) || word.length() < 4 || StopAnalyzer.ENGLISH_STOP_WORDS_SET.contains(word)) {
+         System.out.println(word);
          continue;
        }
        document_length += 1;

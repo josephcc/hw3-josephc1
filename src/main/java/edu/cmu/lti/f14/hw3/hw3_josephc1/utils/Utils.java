@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.apache.lucene.analysis.en.EnglishMinimalStemmer;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.EmptyFSList;
 import org.apache.uima.jcas.cas.EmptyStringList;
@@ -36,10 +37,12 @@ public class Utils {
   }
   private static Properties props;
   private static StanfordCoreNLP pipeline; 
+  private static EnglishMinimalStemmer stemmer;
   static {
     props = new Properties();
     props.put("annotators", "tokenize");
     pipeline = new StanfordCoreNLP(props);
+    stemmer = new EnglishMinimalStemmer();
   }
   
   public static ArrayList<Token> fromMapToTokenList(JCas jcas, Map<String, MutableInteger> counter) {
@@ -136,6 +139,12 @@ public class Utils {
       res.add(s);
     }
     return res;
+  }
+  
+  public static String minimalStem(String word) {
+    char[] _word = word.toCharArray();
+    int _length = stemmer.stem(_word, word.length());
+    return new String(_word, 0, _length);
   }
   
   public static List<String> stanfordTokenizer(String doc) {

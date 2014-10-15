@@ -78,10 +78,12 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
     for (StaticDocument query : queries) {
       Integer queryId = query.queryId;
       System.out.printf("qid=%d\t%s\n", query.queryId, query.text);
+      System.out.println("\t\t\t" + query.vector);
       int r = 1;
       for (StaticDocument candidate : corpora.get(queryId)) {
         String out = String.format("cosine=%.4f\trank=%d\tqid=%d\trel=%d\t%s", candidate.score, r, candidate.queryId, candidate.relevance, candidate.text);
         System.out.println(out);
+        System.out.println("\t\t\t" + candidate.vector);
         r += 1;
       }
     }
@@ -98,7 +100,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
         double cosineSimilarity = Similarity.computeCosineSimilarity(queryVector, docVector);
         double tfidfCosineSimilarity = Similarity.computeCosineSimilarity(Similarity.tfidf(queryVector, queryId), Similarity.tfidf(docVector, queryId));
         double okapiScore = Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 1.2, 0.75); // k=1.2~2.0 b=0.75
-        candidate.score = okapiScore;
+        candidate.score = tfidfCosineSimilarity;
       }
       Collections.sort(corpora.get(queryId), Collections.reverseOrder());
     }
