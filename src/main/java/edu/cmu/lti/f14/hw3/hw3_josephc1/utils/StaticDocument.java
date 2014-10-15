@@ -10,11 +10,13 @@ public class StaticDocument implements Comparable<StaticDocument> {
   public int queryId;
   public Map<String, Number> vector;
   public Double score;
+  public String text;
   
   public StaticDocument(Document doc) {
     relevance = doc.getRelevanceValue();
     queryId = doc.getQueryID();
     vector = Utils.fromDocumentToVector(doc);
+    text = doc.getText();
   }
 
   public int compareTo(StaticDocument arg0) {
@@ -22,7 +24,7 @@ public class StaticDocument implements Comparable<StaticDocument> {
   }
   
   public String toString() {
-    return "<doc:qid=" + queryId + ":rel=" + relevance + ":score=" + score + ">";
+    return "<doc:qid=" + queryId + ":rel=" + relevance + ":score=" + score + " " + text + ">";
   }
 
 }

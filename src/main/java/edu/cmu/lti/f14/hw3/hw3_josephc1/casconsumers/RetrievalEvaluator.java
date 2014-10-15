@@ -75,13 +75,27 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
           IOException {
 
     super.collectionProcessComplete(arg0);
-
-    // TODO :: compute the cosine similarity measure
-
-    // TODO :: compute the rank of retrieved sentences
-
-    // TODO :: compute the metric:: mean reciprocal rank
-
+    scoreAndRank();
+    report();
+  }
+  
+  private void report() {
+    double metric_mrr = compute_mrr();
+    for (StaticDocument query : queries) {
+      Integer queryId = query.queryId;
+      System.out.printf("qid=%d\t%s\n", query.queryId, query.text);
+      int r = 1;
+      for (StaticDocument candidate : corpora.get(queryId)) {
+        String out = String.format("cosine=%.4f\trank=%d\tqid=%d\trel=%d\t%s", candidate.score, r, candidate.queryId, candidate.relevance, candidate.text);
+        System.out.println(out);
+        r += 1;
+      }
+    }
+    String out = String.format("MRR=%.4f", metric_mrr);
+    System.out.println(out);
+  }
+  
+  private void scoreAndRank() {
     for (StaticDocument query : queries) {
       Integer queryId = query.queryId;
       Map<String, Double> queryVector = Utils.fromIntegerMapToDoubleMap(query.vector);
@@ -92,10 +106,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
         double okapiScore = Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 1.2, 0.75); // k=1.2~2.0 b=0.75
         candidate.score = tfidfCosineSimilarity;
       }
+      Collections.sort(corpora.get(queryId), Collections.reverseOrder());
     }
-
-    double metric_mrr = compute_mrr();
-    System.out.println(" (MRR) Mean Reciprocal Rank ::" + metric_mrr);
   }
 
   /**
@@ -107,8 +119,6 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 
     for (StaticDocument query : queries) {
       Integer queryId = query.queryId;
-      Collections.sort(corpora.get(queryId), Collections.reverseOrder());
-//      System.out.println(corpora.get(queryId));
       int r = 1;
       for (StaticDocument candidate : corpora.get(queryId)) {
         if (candidate.relevance == 1) {
