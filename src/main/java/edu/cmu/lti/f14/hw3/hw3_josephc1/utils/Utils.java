@@ -30,14 +30,21 @@ import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 public class Utils {
-  private Utils() {}
+  private Utils() {
+  }
+
   public static final String NDOC_KEY = "::NDOC::";
+
   public static final String TOTAL_LENGTH_KEY = "::TOTAL_LENGTH::";
+
   public static String fromQueryIdToKey(Integer queryId) {
     return "IDF:QID" + queryId;
   }
+
   private static Properties props;
-  private static StanfordCoreNLP pipeline; 
+
+  private static StanfordCoreNLP pipeline;
+
   private static EnglishMinimalStemmer stemmer;
   static {
     props = new Properties();
@@ -45,7 +52,7 @@ public class Utils {
     pipeline = new StanfordCoreNLP(props);
     stemmer = new EnglishMinimalStemmer();
   }
-  
+
   public static ArrayList<Token> fromMapToTokenList(JCas jcas, Map<String, MutableInteger> counter) {
     ArrayList<Token> tokenList = new ArrayList<Token>(counter.size());
     for (Entry<String, MutableInteger> entry : counter.entrySet()) {
@@ -58,21 +65,23 @@ public class Utils {
     }
     return tokenList;
   }
+
   public static Map<String, Double> fromIntegerMapToDoubleMap(Map<String, Number> vector) {
     Map<String, Double> out = new HashMap<String, Double>();
-    for(Entry<String, Number> entry : vector.entrySet()) {
+    for (Entry<String, Number> entry : vector.entrySet()) {
       out.put(entry.getKey(), entry.getValue().doubleValue());
     }
     return out;
   }
+
   public static Map<String, Number> fromTokenListToMap(ArrayList<Token> tokenList) {
     Map<String, Number> counter = new HashMap<String, Number>();
-    for(Token token: tokenList) {
-      counter.put(token.getText(), token.getFrequency());     
+    for (Token token : tokenList) {
+      counter.put(token.getText(), token.getFrequency());
     }
     return counter;
   }
-  
+
   public static Map<String, Number> fromDocumentToVector(Document doc) {
     FSList fsTokenList = doc.getTokenList();
     ArrayList<Token> tokenList = Utils.fromFSListToCollection(fsTokenList, Token.class);
@@ -132,64 +141,63 @@ public class Utils {
 
     return list;
   }
-  
+
   public static List<String> spaceTokenizer(String doc) {
     List<String> res = new ArrayList<String>();
-    
-    for (String s: doc.split("\\s+")) {
+
+    for (String s : doc.split("\\s+")) {
       res.add(s);
     }
     return res;
   }
-  
+
   public static String minimalStem(String word) {
     char[] _word = word.toCharArray();
     int _length = stemmer.stem(_word, word.length());
     return new String(_word, 0, _length);
   }
-  
+
   public static String porterStem(String word) {
-    
+
     PorterStemmer obj = new PorterStemmer();
     obj.setCurrent(word);
     obj.stem();
     String out = obj.getCurrent();
     return out;
   }
-  
+
   public static List<String> stanfordTokenizer(String doc) {
     List<String> res = new ArrayList<String>();
 
-    //joseph TODO: init this in cls initzr
-
+    // joseph TODO: init this in cls initzr
 
     edu.stanford.nlp.pipeline.Annotation document = new edu.stanford.nlp.pipeline.Annotation(doc);
     Utils.pipeline.annotate(document);
 
     for (CoreLabel token : document.get(TokensAnnotation.class)) {
-       String word = token.get(TextAnnotation.class).toLowerCase();
-       res.add(word);
+      String word = token.get(TextAnnotation.class).toLowerCase();
+      res.add(word);
     }
     return res;
   }
-  
+
   public static class MutableInteger {
-    
+
     private int val;
-   
+
     public MutableInteger(int val) {
       this.val = val;
     }
-   
+
     public int get() {
       return val;
     }
-   
+
     public void set(int val) {
       this.val = val;
     }
-   
-    public String toString(){
+
+    public String toString() {
       return Integer.toString(val);
     }
   }

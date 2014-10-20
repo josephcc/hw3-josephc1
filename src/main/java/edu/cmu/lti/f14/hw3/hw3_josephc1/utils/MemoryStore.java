@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryStore {
-  
+
   private static Map<String, MemoryStore> singletonInstances;
+
   public HashMap<String, Object> data;
 
   // SingletonExample prevents any other class from instantiating
