@@ -1,6 +1,9 @@
 package edu.cmu.lti.f14.hw3.hw3_josephc1.casconsumers;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,10 +28,50 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
   private ArrayList<StaticDocument> queries;
 
   private HashMap<Integer, ArrayList<StaticDocument>> corpora;
+  
+  /**
+   * Handle to the final output file
+   */
+  private PrintWriter outFile;
 
+  /**
+   * Path to the final output file
+   */
+  private final String filename = "report.txt";
+
+  /**
+   * Initializer
+   * 
+   * Initialize output file handle
+   * 
+   * @see org.apache.uima.collection.CasConsumer_ImplBase#initialize(org.apache.uima.resource.ResourceSpecifier,
+   *      java.util.Map)
+   */
   public void initialize() throws ResourceInitializationException {
     queries = new ArrayList<StaticDocument>();
     corpora = new HashMap<Integer, ArrayList<StaticDocument>>();
+    try {
+      outFile = new PrintWriter(filename, "UTF-8");
+    } catch (FileNotFoundException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (UnsupportedEncodingException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+  
+  /**
+   * Release resources
+   * 
+   * Release output file handle before class is destroyed
+   * 
+   * @see org.apache.uima.collection.CasConsumer_ImplBase#destroy()
+   */
+  @Override
+  public void destroy() {
+    outFile.close();
+    super.destroy();
   }
 
   /**
@@ -85,11 +128,15 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
                 candidate.queryId, candidate.relevance, candidate.text);
         System.out.println(out);
         System.out.println("\t\t\t" + candidate.vector);
+        if (candidate.relevance == 1) {
+          outFile.println(out);
+        }
         r += 1;
       }
     }
     String out = String.format("MRR=%.4f", metric_mrr);
     System.out.println(out);
+    outFile.println(out);
   }
 
   private void scoreAndRank() {
@@ -103,7 +150,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
                 Similarity.tfidf(queryVector, queryId), Similarity.tfidf(docVector, queryId));
         double okapiScore = Similarity.computeOkapiBM25Score(queryVector, docVector, queryId, 1.2,
                 0.75); // k=1.2~2.0 b=0.75
-        candidate.score = tfidfCosineSimilarity;
+        candidate.score = cosineSimilarity;
       }
       Collections.sort(corpora.get(queryId), Collections.reverseOrder());
     }

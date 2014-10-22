@@ -39,7 +39,8 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
    */
   private void createTermFreqVector(JCas jcas, Document doc) {
 
-    List<String> tokens = Utils.stanfordTokenizer(doc.getText());
+    List<String> tokens = Utils.spaceTokenizer(doc.getText());
+//    List<String> tokens = Utils.stanfordTokenizer(doc.getText());
 
     HashMap<String, MutableInteger> counter = new HashMap<String, MutableInteger>();
     HashMap<String, Object> IDF = MemoryStore.getSingletonInstance(Utils.fromQueryIdToKey(doc
@@ -53,12 +54,12 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
     int document_length = 0;
     for (String word : tokens) {
 
-      word = Utils.minimalStem(word.toLowerCase());
-
-      if (Pattern.matches("\\p{Punct}+", word) || word.length() < 4
-              || StopAnalyzer.ENGLISH_STOP_WORDS_SET.contains(word)) {
-        continue;
-      }
+//      word = Utils.minimalStem(word.toLowerCase());
+//
+//      if (Pattern.matches("\\p{Punct}+", word) || word.length() < 4
+//              || StopAnalyzer.ENGLISH_STOP_WORDS_SET.contains(word)) {
+//        continue;
+//      }
       document_length += 1;
       MutableInteger initValue = new MutableInteger(1);
       MutableInteger oldValue = counter.put(word, initValue);

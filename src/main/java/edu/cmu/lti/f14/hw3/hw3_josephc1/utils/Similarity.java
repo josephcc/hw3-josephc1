@@ -46,7 +46,7 @@ public class Similarity {
     Double n = ((Number) IDF.get(term)).doubleValue();
     // return Math.log( N - n + 0.5 / (n + 0.5) ); // IDF from Okapi BM25, can be negative and
     // problematic
-    return Math.log( (N - n) / n);
+    return Math.log( (N - n + 0.5) / (n + 0.5));
   }
 
   public static Double tf(Map<String, Double> A, String term) {
