@@ -29,23 +29,52 @@ import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
+/**
+ * A class with a private constructor and only static public functions that stores the different
+ * components
+ * 
+ * @author josephcc
+ * 
+ */
 public class Utils {
   private Utils() {
   }
 
+  /**
+   * The key for retrieving number of documents in a corpus in the MemoryStore Singleton
+   */
   public static final String NDOC_KEY = "::NDOC::";
 
+  /**
+   * The key for retrieving total length of documents in a corpus in the MemoryStore Singleton
+   */
   public static final String TOTAL_LENGTH_KEY = "::TOTAL_LENGTH::";
 
+  /**
+   * The key for retrieving the memory hash of queryId corpus in the MemoryStore Singleton
+   */
   public static String fromQueryIdToKey(Integer queryId) {
     return "IDF:QID" + queryId;
   }
 
+  /**
+   * Reference to the Properties parameter for StanfordCoreNlp
+   */
   private static Properties props;
 
+  /**
+   * Reference to the StanfordCoreNLP pipeline
+   */
   private static StanfordCoreNLP pipeline;
 
+  /**
+   * Reference to the EnglishMinimalStemmer from lucene
+   */
   private static EnglishMinimalStemmer stemmer;
+  
+  /**
+   * static initialization blocks to load all the models from external libraries
+   */
   static {
     props = new Properties();
     props.put("annotators", "tokenize");
@@ -169,8 +198,6 @@ public class Utils {
   public static List<String> stanfordTokenizer(String doc) {
     List<String> res = new ArrayList<String>();
 
-    // joseph TODO: init this in cls initzr
-
     edu.stanford.nlp.pipeline.Annotation document = new edu.stanford.nlp.pipeline.Annotation(doc);
     Utils.pipeline.annotate(document);
 
@@ -181,22 +208,45 @@ public class Utils {
     return res;
   }
 
+  /**
+   * Mutable version of the Integer class for fast counting
+   * @author josephcc
+   *
+   */
   public static class MutableInteger {
 
+    /**
+     * the actual value
+     */
     private int val;
 
+    /**
+     * initializer
+     * @param val
+     */
     public MutableInteger(int val) {
       this.val = val;
     }
 
+    /**
+     * Retrieve the value
+     * @return the integer
+     */
     public int get() {
       return val;
     }
 
+    /**
+     * Set the value
+     * @param val
+     */
     public void set(int val) {
       this.val = val;
     }
 
+    /**
+     * pretty print
+     */
     public String toString() {
       return Integer.toString(val);
     }

@@ -24,11 +24,16 @@ import edu.cmu.lti.f14.hw3.hw3_josephc1.utils.StaticDocument;
 import edu.cmu.lti.f14.hw3.hw3_josephc1.utils.Utils;
 
 public class RetrievalEvaluator extends CasConsumer_ImplBase {
-
+  /**
+   * Cache for all the queries.
+   */
   private ArrayList<StaticDocument> queries;
-
-  private HashMap<Integer, ArrayList<StaticDocument>> corpora;
   
+  /**
+   * Cache for all the corpora.
+   */
+  private HashMap<Integer, ArrayList<StaticDocument>> corpora;
+
   /**
    * Handle to the final output file
    */
@@ -42,7 +47,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
   /**
    * Initializer
    * 
-   * Initialize output file handle
+   * Initialize output file handle and the private variables that stores the queries and corpora.
    * 
    * @see org.apache.uima.collection.CasConsumer_ImplBase#initialize(org.apache.uima.resource.ResourceSpecifier,
    *      java.util.Map)
@@ -60,7 +65,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
       e.printStackTrace();
     }
   }
-  
+
   /**
    * Release resources
    * 
@@ -75,7 +80,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
   }
 
   /**
-   * TODO :: 1. construct the global word dictionary 2. keep the word frequency for each sentence
+   * Store the quries and corpus in the private variable. Global word frequency and sentence tokens
+   * are processed in previous annotator.
    */
   @Override
   public void processCas(CAS aCas) throws ResourceProcessException {
@@ -105,7 +111,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
   }
 
   /**
-   * TODO 1. Compute Cosine Similarity and rank the retrieved sentences 2. Compute the MRR metric
+   * Score, rank the documents based on the query, calculate the MRR score, and output to file.
    */
   @Override
   public void collectionProcessComplete(ProcessTrace arg0) throws ResourceProcessException,
@@ -116,6 +122,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
     report();
   }
 
+  /**
+   * Write the results to the output file.
+   */
   private void report() {
     double metric_mrr = compute_mrr();
     for (StaticDocument query : queries) {
@@ -139,6 +148,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
     outFile.println(out);
   }
 
+  /**
+   * Score rank the documents.
+   */
   private void scoreAndRank() {
     for (StaticDocument query : queries) {
       Integer queryId = query.queryId;
@@ -157,8 +169,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
   }
 
   /**
+   * Calculate the MRR score on the ranked documents.
    * 
-   * @return mrr
+   * @return mrr the MRR score
    */
   private double compute_mrr() {
     double metric_mrr = 0.0;
